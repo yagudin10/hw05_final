@@ -53,10 +53,13 @@ class ImageTest(TestCase):
         self.client.post(reverse('new_post'), {'text': self.text, 'group': 1})
         Post.objects.get(pk=2)
         response = self.client.get('/')
-        self.assertNotContains(response, self.text, status_code=200, msg_prefix='', html=False)
+        self.assertNotContains(response, self.text,
+                               status_code=200, msg_prefix='', html=False)
         time.sleep(20)
         response = self.client.get('/')
-        self.assertContains(response, self.text, status_code=200, msg_prefix='', html=False)
+        self.assertContains(response, self.text,
+                            status_code=200, msg_prefix='', html=False)
+
 
 class FollowersTest(TestCase):
     def setUp(self):
@@ -87,29 +90,37 @@ class FollowersTest(TestCase):
             self.client.post(reverse('new_post'), {
                              'text': self.text, 'image': fp, 'group': 1}, follow=True)
         self.client.logout()
-        self.client.login(username="brian", password="zxnm11a!s") 
-        
-        
-#Только авторизированный пользователь может комментировать посты.
+        self.client.login(username="brian", password="zxnm11a!s")
+
+
+# Только авторизированный пользователь может комментировать посты.
+
+
     def test_only_authorised_user_can_make_comments(self):
         test_comment = 'test_comment'
-        response = self.client.post('/sarah/1/comment/', {'text': test_comment}, follow=True)
+        response = self.client.post(
+            '/sarah/1/comment/', {'text': test_comment}, follow=True)
         self.assertEqual(response.status_code, 200)
         response = self.client.get('/sarah/1/')
-        self.assertContains(response, test_comment, status_code=200, msg_prefix='', html=False)   
+        self.assertContains(response, test_comment,
+                            status_code=200, msg_prefix='', html=False)
         self.client.logout()
-        response = self.client.post('/sarah/1/comment/', {'text': test_comment}, follow=True)
-        self.assertRedirects(response,'/auth/login/?next=%2Fsarah%2F1%2Fcomment%2F', status_code=302, 
-                        target_status_code=200, msg_prefix='', 
-                        fetch_redirect_response=True)
+        response = self.client.post(
+            '/sarah/1/comment/', {'text': test_comment}, follow=True)
+        self.assertRedirects(response, '/auth/login/?next=%2Fsarah%2F1%2Fcomment%2F',
+                             status_code=302,
+                             target_status_code=200, msg_prefix='',
+                             fetch_redirect_response=True)
 
 
-#Авторизованный пользователь может подписываться на других пользователей и удалять их из подписок.
+# Авторизованный пользователь может подписываться на других пользователей и удалять их из подписок.
+
+
     def test_user2_follows_to_user1(self):
         response = self.client.get('/sarah/follow')
-        author1 = User.objects.get(username = 'brian')
+        author1 = User.objects.get(username='brian')
         follower = Follow.objects.filter(user=author1).count()
-        author2 = User.objects.get(username = 'sarah')
+        author2 = User.objects.get(username='sarah')
         following = Follow.objects.filter(author=author2).count()
         self.assertEqual(follower, following)
         self.assertEqual(follower, 1)
@@ -118,27 +129,25 @@ class FollowersTest(TestCase):
         following = Follow.objects.filter(author=author2).count()
         self.assertEqual(follower, following)
         self.assertEqual(follower, 0)
-    
-#Новая запись пользователя появляется в ленте тех, кто на него подписан и не появляется в ленте тех, кто не подписан на него.
+
+# Новая запись пользователя появляется в ленте тех,
+# кто на него подписан и не появляется в ленте тех, кто не подписан на него.
+
     def test_new_post_is_shown_in_favourite_users(self):
-        response = self.client.get('/sarah/follow') 
+        response = self.client.get('/sarah/follow')
         response = self.client.get('/follow/')
-        self.assertContains(response, self.text, status_code=200, msg_prefix='', html=False)
+        self.assertContains(response, self.text,
+                            status_code=200, msg_prefix='', html=False)
         response = self.client.get('/sarah/unfollow')
         response = self.client.get('/follow/')
-        self.assertNotContains(response, self.text, status_code=200, msg_prefix='', html=False)
-        Post.objects.create(author = User.objects.get(username='sarah'), text = 'favourite users')
+        self.assertNotContains(response, self.text,
+                               status_code=200, msg_prefix='', html=False)
+        Post.objects.create(author=User.objects.get(
+            username='sarah'), text='favourite users')
         response = self.client.get('/follow/')
-        self.assertNotContains(response, 'favourite users', status_code=200, msg_prefix='', html=False) 
-        response = self.client.get('/sarah/follow') 
+        self.assertNotContains(response, 'favourite users',
+                               status_code=200, msg_prefix='', html=False)
+        response = self.client.get('/sarah/follow')
         response = self.client.get('/follow/')
-        self.assertContains(response, self.text, status_code=200, msg_prefix='', html=False)
-
-
-
-        
-
-
-
-
-
+        self.assertContains(response, self.text,
+                            status_code=200, msg_prefix='', html=False)

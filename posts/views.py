@@ -8,7 +8,6 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_page
 
 
-@cache_page(20)
 def index(request):
     post_list = Post.objects.order_by("-pub_date").all()
     follow = False
@@ -18,7 +17,8 @@ def index(request):
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    return render(request, 'index.html', {'page': page, 'paginator': paginator, 'follow': follow})
+    return render(request, 'index.html',
+                  {'page': page, 'paginator': paginator, 'follow': follow})
 
 
 def group_posts(request, slug):
@@ -28,7 +28,8 @@ def group_posts(request, slug):
     # переменная в URL с номером запрошенной страницы
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    return render(request, "group.html", {"group": group, 'page': page, 'paginator': paginator})
+    return render(request, "group.html",
+                  {"group": group, 'page': page, 'paginator': paginator})
 
 
 def year(request):
@@ -49,13 +50,15 @@ def new_post(request):
                 text=text, author=request.user, group=group, image=image)
             return redirect('index')
 
-        return render(request, 'new_post.html', {'form': form, 'title': 'Добавить запись',
-                                                 'button': 'Добавить'})
+        return render(request, 'new_post.html',
+                      {'form': form, 'title': 'Добавить запись',
+                       'button': 'Добавить'})
 
     form = PostForm()
 
-    return render(request, 'new_post.html', {'form': form, 'title': 'Добавить запись',
-                                             'button': 'Добавить'})
+    return render(request, 'new_post.html',
+                  {'form': form, 'title': 'Добавить запись',
+                   'button': 'Добавить'})
 
 
 def profile(request, username):
@@ -72,9 +75,10 @@ def profile(request, username):
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
 
-    return render(request, "profile.html", {"author": author, 'page': page, 'paginator': paginator,
-                                            'following': following, 'cnt_post': cnt_post,
-                                            'followings': followings, 'follower': follower})
+    return render(request, "profile.html",
+                  {"author": author, 'page': page, 'paginator': paginator,
+                   'following': following, 'cnt_post': cnt_post,
+                   'followings': followings, 'follower': follower})
 
 
 def post_view(request, username, post_id):
@@ -85,8 +89,9 @@ def post_view(request, username, post_id):
     post = Post.objects.get(author=author, id=post_id)
     form = CommentForm()
     items = Comment.objects.filter(post=post_id)
-    return render(request, "post.html", {"form": form, "author": author, "post": post, "cnt": cnt,
-                                         'items': items, 'followings': followings, 'follower': follower})
+    return render(request, "post.html",
+                  {"form": form, "author": author, "post": post, "cnt": cnt,
+                   'items': items, 'followings': followings, 'follower': follower})
 
 
 def post_edit(request, username, post_id):
@@ -103,9 +108,13 @@ def post_edit(request, username, post_id):
             post.save()
             return redirect('post', username=username, post_id=post_id)
 
-        return render(request, 'new_post.html', {'form': form, 'post': post, 'title': 'Редактировать запись', 'button': 'Сохранить'})
+        return render(request, 'new_post.html',
+                      {'form': form, 'post': post,
+                       'title': 'Редактировать запись', 'button': 'Сохранить'})
 
-    return render(request, "new_post.html",  {'form': form, 'post': post, 'title': 'Редактировать запись', 'button': 'Сохранить'})
+    return render(request, "new_post.html",
+                  {'form': form, 'post': post,
+                   'title': 'Редактировать запись', 'button': 'Сохранить'})
 
 
 def page_not_found(request, exception):
@@ -116,6 +125,7 @@ def page_not_found(request, exception):
 
 def server_error(request):
     return render(request, "misc/500.html", status=500)
+
 
 @login_required
 def add_comment(request, username, post_id):
@@ -137,7 +147,8 @@ def add_comment(request, username, post_id):
 @login_required
 def follow_index(request):
     follow = User.objects.get(username=request.user.username)
-    post_list = Post.objects.filter(author__following__user=follow).select_related(
+    post_list = Post.objects.filter(
+        author__following__user=follow).select_related(
         'author').order_by("-pub_date").all()
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
