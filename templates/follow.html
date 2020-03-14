@@ -9,9 +9,9 @@
     {% include "menu.html" with index=True %}
 
     <h1> Избранные авторы</h1>
-    {% cache 20 page_index page.number %}
-        {% for post in page %}
-    {% include "post_item.html" with post=post %}
+    {% cache 20 page_follow page %}
+    {% for post in page %}
+        {% include "post_item.html" with post=post %}
     {% endfor %}
 
     {% if page.has_other_pages %}

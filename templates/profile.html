@@ -19,8 +19,8 @@
                                 <ul class="list-group list-group-flush">
                                         <li class="list-group-item">
                                                 <div class="h6 text-muted">
-                                                        Подписчиков: {{ follower }} <br />
-                                                        Подписан: {{ followings }}
+                                                        Подписчиков: {{ followings }} <br />
+                                                        Подписан: {{ follower }}
                                                 </div>
                                         </li>
                                         <li class="list-group-item">
@@ -29,6 +29,7 @@
                                                         Записей: {{ cnt_post }}
                                                 </div>
                                         </li>
+                                        {% if author.username != user.username %}
                                         <li class="list-group-item">
                                                 {% if following %}
                                                 <a class="btn btn-lg btn-light"
@@ -43,6 +44,7 @@
                                                 </a>
                                                 {% endif %}
                                         </li>
+                                        {% endif %}
                                 </ul>
                         </div>
                 </div>
