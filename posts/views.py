@@ -104,7 +104,7 @@ def post_edit(request, username, post_id):
         if form.is_valid():
             post.group = form.cleaned_data['group']
             post.text = form.cleaned_data['text']
-            post.image = request.FILES['image']
+            post.image = request.FILES.get('image', None)
             post.save()
             return redirect('post', username=username, post_id=post_id)
 
